@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>도보 생활권 인프라 지도</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; padding:0; height:100%; font-family:"맑은 고딕","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif; background:#06101F; color:#fff; overflow:hidden; }
+  .header { position:fixed; top:0; left:0; right:0; z-index:1000; padding:calc(8px + env(safe-area-inset-top)) 10px 8px; background:linear-gradient(180deg,rgba(6,16,31,.98),rgba(6,16,31,.90)); border-bottom:1px solid rgba(201,169,97,.28); backdrop-filter:blur(7px); }
+  .tag { font-size:9px; color:#C9A961; letter-spacing:2px; font-weight:800; }
+  h1 { margin:3px 0 5px; font-size:15px; line-height:1.18; }
+  .sub { font-size:10px; color:#9DA8C0; margin-bottom:7px; }
+  .searchbox { display:flex; gap:5px; }
+  .searchbox input { flex:1; min-width:0; height:34px; border-radius:10px; border:1px solid rgba(201,169,97,.35); background:rgba(255,255,255,.07); color:#fff; padding:0 10px; font-size:13px; outline:none; }
+  .searchbox button { height:34px; border:0; border-radius:10px; padding:0 12px; background:#C9A961; color:#06101F; font-weight:800; font-size:12px; cursor:pointer; white-space:nowrap; }
+  .hint { margin-top:5px; font-size:9.5px; color:#8E99AE; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #map { position:absolute; top:134px; bottom:156px; left:0; right:0; background:#06101F; }
+  .marker-main { background:#C9A961; color:#06101F; padding:6px 10px; border-radius:18px; font-size:11px; font-weight:900; white-space:nowrap; box-shadow:0 3px 12px rgba(201,169,97,.55); border:2px solid #fff; }
+  .marker-poi { background:#06101F; color:#fff; padding:5px 8px; border-radius:14px; font-size:10px; font-weight:700; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.5); border:1.5px solid; }
+  .cat-work{border-color:#E0BD7E}.cat-shop{border-color:#6BA3E0}.cat-medical{border-color:#E06B7E}.cat-school{border-color:#7EE0A3}.cat-park{border-color:#A37EE0}.cat-culture{border-color:#E0D67E}
+  .leaflet-popup-content-wrapper{background:#06101F;color:#fff;border-radius:10px;border:1px solid #C9A961}.leaflet-popup-tip{background:#06101F}.leaflet-popup-content{font-size:12px;line-height:1.45}.pop-name{color:#C9A961;font-weight:800;font-size:13px}.pop-walk{color:#E0BD7E;font-size:11px;margin:4px 0}.pop-desc{color:#C9D2E5;font-size:11px}.leaflet-container a.leaflet-popup-close-button{color:#C9A961}
+  .panel { position:fixed; bottom:0; left:0; right:0; z-index:999; padding:8px 10px calc(9px + env(safe-area-inset-bottom)); max-height:156px; background:linear-gradient(0deg,#06101F 92%,rgba(6,16,31,.95)); border-top:1px solid rgba(201,169,97,.28); }
+  .filters { display:flex; gap:5px; overflow-x:auto; padding-bottom:7px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }.filters::-webkit-scrollbar{display:none}
+  .chip { flex-shrink:0; padding:7px 10px; border-radius:16px; font-size:11px; font-weight:800; background:rgba(255,255,255,.06); color:#C9D2E5; border:1px solid rgba(255,255,255,.12); cursor:pointer; white-space:nowrap; }.chip.active{background:#C9A961;color:#06101F;border-color:#C9A961}.cnt{opacity:.7;margin-left:2px}
+  .legend { display:grid; grid-template-columns:1fr 1fr; gap:3px 8px; font-size:9.5px; color:#9DA8C0; }.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle}.footer-info{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08);font-size:8.8px;color:#6E7A93;text-align:center}
+  .leaflet-control-zoom a{background:#06101F;color:#C9A961;border:1px solid rgba(201,169,97,.4)}.leaflet-control-attribution{background:rgba(6,16,31,.85)!important;color:#6E7A93!important;font-size:9px}.leaflet-control-attribution a{color:#9DA8C0!important}
+  @media (max-height:700px){ #map{top:126px;bottom:140px}.panel{max-height:140px}.legend{display:none} }
+  @media (min-width:768px){ .header{padding-left:18px;padding-right:18px} h1{font-size:20px}.sub{font-size:12px}.searchbox{max-width:620px}.panel{max-height:170px}.legend{grid-template-columns:repeat(3,1fr)} #map{top:142px;bottom:170px} }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="tag">MOBILE INFRA MAP · 도보 생활권</div>
+  <h1 id="title">KCC 스위첸 웰츠타워 2단지</h1>
+  <div class="sub" id="subtitle">주소를 입력하면 해당 위치 기준으로 지도가 이동합니다</div>
+  <div class="searchbox">
+    <input id="addressInput" type="search" placeholder="주소 또는 단지명 입력 예: 울산 동구 전하동 280-3" value="울산 동구 전하동 280-3">
+    <button id="searchBtn">검색</button>
+  </div>
+  <div class="hint" id="hint">공유 링크 뒤에 ?q=주소 를 붙이면 자동 검색됩니다.</div>
+</div>
+<div id="map"></div>
+<div class="panel">
+  <div class="filters" id="filters">
+    <div class="chip active" data-cat="all">전체 <span class="cnt" id="cnt-all">0</span></div>
+    <div class="chip" data-cat="work">직장 <span class="cnt" id="cnt-work">0</span></div>
+    <div class="chip" data-cat="shop">쇼핑 <span class="cnt" id="cnt-shop">0</span></div>
+    <div class="chip" data-cat="medical">의료 <span class="cnt" id="cnt-medical">0</span></div>
+    <div class="chip" data-cat="school">학교 <span class="cnt" id="cnt-school">0</span></div>
+    <div class="chip" data-cat="park">공원 <span class="cnt" id="cnt-park">0</span></div>
+    <div class="chip" data-cat="culture">문화 <span class="cnt" id="cnt-culture">0</span></div>
+  </div>
+  <div class="legend">
+    <div><span class="dot" style="background:#E0BD7E"></span>직장</div><div><span class="dot" style="background:#6BA3E0"></span>쇼핑·생활</div><div><span class="dot" style="background:#E06B7E"></span>의료</div><div><span class="dot" style="background:#7EE0A3"></span>학교</div><div><span class="dot" style="background:#A37EE0"></span>공원</div><div><span class="dot" style="background:#E0D67E"></span>문화</div>
+  </div>
+  <div class="footer-info">도보시간은 분당 67m 기준 · 검색 좌표는 OpenStreetMap Nominatim 기준</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+let MAIN = { lat:35.4955, lng:129.4135, name:"KCC 스위첸 웰츠타워 2단지", addr:"울산 동구 전하동 280-3" };
+const POIS=[
+{cat:"work",name:"HD 현대중공업 정문",lat:35.4953,lng:129.4170,walk:3,desc:"임직원 배후수요"},{cat:"work",name:"현대미포조선",lat:35.4920,lng:129.4248,walk:12,desc:"조선소 협력사 포함 거주 수요"},{cat:"work",name:"현대중공업 본사동",lat:35.4988,lng:129.4180,walk:5,desc:"사무직 임직원 출퇴근 동선"},
+{cat:"shop",name:"현대백화점 동구점",lat:35.5005,lng:129.4108,walk:8,desc:"식품·생활·패션"},{cat:"shop",name:"전하시장",lat:35.4900,lng:129.4078,walk:9,desc:"전통시장"},{cat:"shop",name:"CU 전하점",lat:35.4960,lng:129.4135,walk:1,desc:"24시간 편의점"},{cat:"shop",name:"이마트 동구점",lat:35.5018,lng:129.4082,walk:11,desc:"대형마트"},
+{cat:"medical",name:"울산대학교병원",lat:35.5012,lng:129.4152,walk:9,desc:"종합 의료서비스"},{cat:"medical",name:"동구보건소",lat:35.4945,lng:129.4042,walk:12,desc:"보건 행정"},{cat:"medical",name:"더에이치한방병원",lat:35.4978,lng:129.4115,walk:5,desc:"한방 진료"},
+{cat:"school",name:"전하초등학교",lat:35.4942,lng:129.4108,walk:5,desc:"도보 통학권"},{cat:"school",name:"현대중학교",lat:35.4965,lng:129.4205,walk:9,desc:"중학교"},{cat:"school",name:"현대고등학교",lat:35.4970,lng:129.4218,walk:10,desc:"고등학교"},{cat:"school",name:"전하유치원",lat:35.4938,lng:129.4115,walk:5,desc:"공립 유치원"},
+{cat:"park",name:"명덕호수공원",lat:35.4985,lng:129.4060,walk:10,desc:"산책·러닝코스"},{cat:"park",name:"염포산 산책로",lat:35.5060,lng:129.4020,walk:18,desc:"트레킹"},{cat:"park",name:"대왕암공원",lat:35.4860,lng:129.4565,walk:0,desc:"차량 이동 권역"},
+{cat:"culture",name:"HD아트센터",lat:35.4922,lng:129.4198,walk:11,desc:"공연·전시"},{cat:"culture",name:"한마음회관",lat:35.4982,lng:129.4225,walk:11,desc:"복지·스포츠"},{cat:"culture",name:"호텔현대 바이 라한 울산",lat:35.4945,lng:129.4172,walk:5,desc:"호텔·웨딩·뷔페"}
+];
+function walkText(min){return min===0?"차량 이동":`도보 ${min}분 (약 ${min*67}m)`}
+function distMin(lat1,lng1,lat2,lng2){const R=6371000,toRad=d=>d*Math.PI/180;const dLat=toRad(lat2-lat1),dLng=toRad(lng2-lng1);const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;return Math.max(1,Math.round((R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)))/67));}
+const map=L.map('map',{center:[MAIN.lat+.001,MAIN.lng+.003],zoom:15,zoomControl:true,attributionControl:true});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© <a href="https://www.openstreetmap.org/">OSM</a> · © <a href="https://carto.com/">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(map);
+let mainMarker, circles=[]; const markers=[];
+function drawMain(){ if(mainMarker) map.removeLayer(mainMarker); circles.forEach(c=>map.removeLayer(c)); circles=[]; const icon=L.divIcon({html:'<div class="marker-main">★ 기준 위치</div>',className:'',iconSize:[88,28],iconAnchor:[44,14]}); mainMarker=L.marker([MAIN.lat,MAIN.lng],{icon,zIndexOffset:1000}).addTo(map).bindPopup(`<div class="pop-name">★ ${MAIN.name}</div><div class="pop-walk">${MAIN.addr||''}</div><div class="pop-desc">입력 주소 기준 생활권 지도</div>`); [5,10,15].forEach(min=>circles.push(L.circle([MAIN.lat,MAIN.lng],{radius:min*67,color:'#C9A961',fillColor:'#C9A961',fillOpacity:.04,weight:1,opacity:.35,dashArray:'4,4'}).addTo(map))); document.getElementById('title').textContent=MAIN.name; document.getElementById('subtitle').textContent=(MAIN.addr||'입력 위치')+' 기준 도보권'; }
+function drawPois(){ const counts={all:0,work:0,shop:0,medical:0,school:0,park:0,culture:0}; POIS.forEach(p=>{ p.walk=distMin(MAIN.lat,MAIN.lng,p.lat,p.lng); const icon=L.divIcon({html:`<div class="marker-poi cat-${p.cat}">${p.name}</div>`,className:'',iconSize:[p.name.length*7+18,22],iconAnchor:[(p.name.length*7+18)/2,11]}); const m=L.marker([p.lat,p.lng],{icon}); m.bindPopup(`<div class="pop-name">${p.name}</div><div class="pop-walk">${walkText(p.walk)}</div><div class="pop-desc">${p.desc}</div>`); m.addTo(map); markers.push({marker:m,cat:p.cat}); counts[p.cat]++; counts.all++; }); Object.keys(counts).forEach(k=>{const el=document.getElementById('cnt-'+k); if(el) el.textContent=counts[k];}); }
+function fitAll(){ const group=L.featureGroup([mainMarker,...markers.map(x=>x.marker)]); map.fitBounds(group.getBounds().pad(.12)); setTimeout(()=>map.invalidateSize(),250); }
+async function searchAddress(q){ q=(q||'').trim(); if(!q) return; const hint=document.getElementById('hint'); hint.textContent='주소 검색 중...'; try{ const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&q='+encodeURIComponent(q); const res=await fetch(url,{headers:{'Accept':'application/json'}}); const data=await res.json(); if(!data.length){hint.textContent='검색 결과가 없습니다. 동/번지까지 넣어보세요.'; return;} MAIN={lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon),name:q,addr:data[0].display_name}; drawMain(); fitAll(); hint.textContent='검색 완료 · 이 주소를 공유하려면 주소창 URL을 복사하세요.'; const newUrl=location.pathname+'?q='+encodeURIComponent(q); history.replaceState(null,'',newUrl); }catch(e){ hint.textContent='검색 실패: 인터넷 연결 또는 브라우저 보안 설정을 확인하세요.'; }}
+document.querySelectorAll('.chip').forEach(chip=>chip.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); const cat=chip.dataset.cat; markers.forEach(({marker,cat:c})=>{if(cat==='all'||cat===c){if(!map.hasLayer(marker))map.addLayer(marker)}else{if(map.hasLayer(marker))map.removeLayer(marker)}})}));
+document.getElementById('searchBtn').addEventListener('click',()=>searchAddress(document.getElementById('addressInput').value));
+document.getElementById('addressInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchAddress(e.target.value)});
+drawMain(); drawPois(); fitAll(); const params=new URLSearchParams(location.search); if(params.get('q')){document.getElementById('addressInput').value=params.get('q'); searchAddress(params.get('q'));}
+</script>
+</body>
+</html>
