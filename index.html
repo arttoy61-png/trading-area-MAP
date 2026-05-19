@@ -60,28 +60,88 @@
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-let MAIN = { lat:35.4955, lng:129.4135, name:"KCC 스위첸 웰츠타워 2단지", addr:"울산 동구 전하동 280-3" };
-const POIS=[
-{cat:"work",name:"HD 현대중공업 정문",lat:35.4953,lng:129.4170,walk:3,desc:"임직원 배후수요"},{cat:"work",name:"현대미포조선",lat:35.4920,lng:129.4248,walk:12,desc:"조선소 협력사 포함 거주 수요"},{cat:"work",name:"현대중공업 본사동",lat:35.4988,lng:129.4180,walk:5,desc:"사무직 임직원 출퇴근 동선"},
-{cat:"shop",name:"현대백화점 동구점",lat:35.5005,lng:129.4108,walk:8,desc:"식품·생활·패션"},{cat:"shop",name:"전하시장",lat:35.4900,lng:129.4078,walk:9,desc:"전통시장"},{cat:"shop",name:"CU 전하점",lat:35.4960,lng:129.4135,walk:1,desc:"24시간 편의점"},{cat:"shop",name:"이마트 동구점",lat:35.5018,lng:129.4082,walk:11,desc:"대형마트"},
-{cat:"medical",name:"울산대학교병원",lat:35.5012,lng:129.4152,walk:9,desc:"종합 의료서비스"},{cat:"medical",name:"동구보건소",lat:35.4945,lng:129.4042,walk:12,desc:"보건 행정"},{cat:"medical",name:"더에이치한방병원",lat:35.4978,lng:129.4115,walk:5,desc:"한방 진료"},
-{cat:"school",name:"전하초등학교",lat:35.4942,lng:129.4108,walk:5,desc:"도보 통학권"},{cat:"school",name:"현대중학교",lat:35.4965,lng:129.4205,walk:9,desc:"중학교"},{cat:"school",name:"현대고등학교",lat:35.4970,lng:129.4218,walk:10,desc:"고등학교"},{cat:"school",name:"전하유치원",lat:35.4938,lng:129.4115,walk:5,desc:"공립 유치원"},
-{cat:"park",name:"명덕호수공원",lat:35.4985,lng:129.4060,walk:10,desc:"산책·러닝코스"},{cat:"park",name:"염포산 산책로",lat:35.5060,lng:129.4020,walk:18,desc:"트레킹"},{cat:"park",name:"대왕암공원",lat:35.4860,lng:129.4565,walk:0,desc:"차량 이동 권역"},
-{cat:"culture",name:"HD아트센터",lat:35.4922,lng:129.4198,walk:11,desc:"공연·전시"},{cat:"culture",name:"한마음회관",lat:35.4982,lng:129.4225,walk:11,desc:"복지·스포츠"},{cat:"culture",name:"호텔현대 바이 라한 울산",lat:35.4945,lng:129.4172,walk:5,desc:"호텔·웨딩·뷔페"}
-];
-function walkText(min){return min===0?"차량 이동":`도보 ${min}분 (약 ${min*67}m)`}
-function distMin(lat1,lng1,lat2,lng2){const R=6371000,toRad=d=>d*Math.PI/180;const dLat=toRad(lat2-lat1),dLng=toRad(lng2-lng1);const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;return Math.max(1,Math.round((R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)))/67));}
-const map=L.map('map',{center:[MAIN.lat+.001,MAIN.lng+.003],zoom:15,zoomControl:true,attributionControl:true});
+let MAIN={lat:35.4955,lng:129.4135,name:'울산 동구 전하동 280-3',addr:'울산 동구 전하동 280-3'};
+let mainMarker=null, circleLayers=[], markers=[];
+const map=L.map('map',{center:[MAIN.lat,MAIN.lng],zoom:15,zoomControl:true,attributionControl:true});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© <a href="https://www.openstreetmap.org/">OSM</a> · © <a href="https://carto.com/">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(map);
-let mainMarker, circles=[]; const markers=[];
-function drawMain(){ if(mainMarker) map.removeLayer(mainMarker); circles.forEach(c=>map.removeLayer(c)); circles=[]; const icon=L.divIcon({html:'<div class="marker-main">★ 기준 위치</div>',className:'',iconSize:[88,28],iconAnchor:[44,14]}); mainMarker=L.marker([MAIN.lat,MAIN.lng],{icon,zIndexOffset:1000}).addTo(map).bindPopup(`<div class="pop-name">★ ${MAIN.name}</div><div class="pop-walk">${MAIN.addr||''}</div><div class="pop-desc">입력 주소 기준 생활권 지도</div>`); [5,10,15].forEach(min=>circles.push(L.circle([MAIN.lat,MAIN.lng],{radius:min*67,color:'#C9A961',fillColor:'#C9A961',fillOpacity:.04,weight:1,opacity:.35,dashArray:'4,4'}).addTo(map))); document.getElementById('title').textContent=MAIN.name; document.getElementById('subtitle').textContent=(MAIN.addr||'입력 위치')+' 기준 도보권'; }
-function drawPois(){ const counts={all:0,work:0,shop:0,medical:0,school:0,park:0,culture:0}; POIS.forEach(p=>{ p.walk=distMin(MAIN.lat,MAIN.lng,p.lat,p.lng); const icon=L.divIcon({html:`<div class="marker-poi cat-${p.cat}">${p.name}</div>`,className:'',iconSize:[p.name.length*7+18,22],iconAnchor:[(p.name.length*7+18)/2,11]}); const m=L.marker([p.lat,p.lng],{icon}); m.bindPopup(`<div class="pop-name">${p.name}</div><div class="pop-walk">${walkText(p.walk)}</div><div class="pop-desc">${p.desc}</div>`); m.addTo(map); markers.push({marker:m,cat:p.cat}); counts[p.cat]++; counts.all++; }); Object.keys(counts).forEach(k=>{const el=document.getElementById('cnt-'+k); if(el) el.textContent=counts[k];}); }
-function fitAll(){ const group=L.featureGroup([mainMarker,...markers.map(x=>x.marker)]); map.fitBounds(group.getBounds().pad(.12)); setTimeout(()=>map.invalidateSize(),250); }
-async function searchAddress(q){ q=(q||'').trim(); if(!q) return; const hint=document.getElementById('hint'); hint.textContent='주소 검색 중...'; try{ const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&q='+encodeURIComponent(q); const res=await fetch(url,{headers:{'Accept':'application/json'}}); const data=await res.json(); if(!data.length){hint.textContent='검색 결과가 없습니다. 동/번지까지 넣어보세요.'; return;} MAIN={lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon),name:q,addr:data[0].display_name}; drawMain(); fitAll(); hint.textContent='검색 완료 · 이 주소를 공유하려면 주소창 URL을 복사하세요.'; const newUrl=location.pathname+'?q='+encodeURIComponent(q); history.replaceState(null,'',newUrl); }catch(e){ hint.textContent='검색 실패: 인터넷 연결 또는 브라우저 보안 설정을 확인하세요.'; }}
+const categoryLabel={work:'직장',shop:'쇼핑',medical:'의료',school:'학교',park:'공원',culture:'문화'};
+const categoryDesc={work:'업무·산업·오피스 시설',shop:'쇼핑·생활 편의시설',medical:'병원·약국·의료시설',school:'학교·교육시설',park:'공원·녹지·산책시설',culture:'문화·여가시설'};
+function walkText(min){if(min===0)return'차량 이동';return`도보 ${min}분 (약 ${min*67}m)`}
+function distMin(a,b,c,d){const R=6371000, toRad=x=>x*Math.PI/180; const x=toRad(d-b)*Math.cos(toRad((a+c)/2)); const y=toRad(c-a); return Math.max(1,Math.round(Math.sqrt(x*x+y*y)*R/67));}
+function clearPois(){ markers.forEach(({marker})=>map.removeLayer(marker)); markers=[]; ['all','work','shop','medical','school','park','culture'].forEach(k=>{const el=document.getElementById('cnt-'+k); if(el) el.textContent='0';}); }
+function drawMain(){
+  if(mainMarker) map.removeLayer(mainMarker);
+  circleLayers.forEach(c=>map.removeLayer(c)); circleLayers=[];
+  document.getElementById('title').textContent=MAIN.name;
+  document.getElementById('subtitle').textContent=MAIN.addr||'선택 위치 기준 생활권 분석';
+  const mainIcon=L.divIcon({html:'<div class="marker-main">★ 기준 위치</div>',className:'',iconSize:[88,28],iconAnchor:[44,14]});
+  mainMarker=L.marker([MAIN.lat,MAIN.lng],{icon:mainIcon,zIndexOffset:1000}).addTo(map).bindPopup(`<div class="pop-name">★ ${MAIN.name}</div><div class="pop-walk">기준 위치</div><div class="pop-desc">${MAIN.addr||''}</div>`);
+  [5,10,15].forEach(min=>circleLayers.push(L.circle([MAIN.lat,MAIN.lng],{radius:min*67,color:'#C9A961',fillColor:'#C9A961',fillOpacity:.04,weight:1,opacity:.35,dashArray:'4,4'}).addTo(map)));
+}
+function addPoi(p){
+  const w=Math.min(p.name.length*7+18,180);
+  const icon=L.divIcon({html:`<div class="marker-poi cat-${p.cat}">${p.name}</div>`,className:'',iconSize:[w,22],iconAnchor:[w/2,11]});
+  const m=L.marker([p.lat,p.lng],{icon});
+  m.bindPopup(`<div class="pop-name">${p.name}</div><div class="pop-walk">${walkText(p.walk)}</div><div class="pop-desc">${p.desc}</div>`);
+  m.addTo(map); markers.push({marker:m,cat:p.cat});
+}
+function updateCounts(){
+  const counts={all:markers.length,work:0,shop:0,medical:0,school:0,park:0,culture:0};
+  markers.forEach(x=>counts[x.cat]++);
+  Object.keys(counts).forEach(k=>{const el=document.getElementById('cnt-'+k); if(el) el.textContent=counts[k];});
+}
+function fallbackPois(){
+  const sample=[['shop','반경 1.5km 생활시설',MAIN.lat+0.003,MAIN.lng+0.002],['medical','반경 1.5km 의료시설',MAIN.lat-0.002,MAIN.lng+0.002],['school','반경 1.5km 교육시설',MAIN.lat+0.001,MAIN.lng-0.003],['park','반경 1.5km 공원시설',MAIN.lat-0.003,MAIN.lng-0.002],['culture','반경 1.5km 문화시설',MAIN.lat+0.004,MAIN.lng-0.001],['work','반경 1.5km 업무시설',MAIN.lat-0.001,MAIN.lng+0.004]];
+  sample.forEach(([cat,name,lat,lng])=>addPoi({cat,name,lat,lng,walk:distMin(MAIN.lat,MAIN.lng,lat,lng),desc:'자동 검색 실패 시 표시되는 기준 마커입니다'})); updateCounts();
+}
+function classify(tags){
+  const a=tags.amenity||'', shop=tags.shop||'', leisure=tags.leisure||'', office=tags.office||'', landuse=tags.landuse||'', tourism=tags.tourism||'';
+  if(['hospital','clinic','pharmacy','dentist','doctors'].includes(a)) return 'medical';
+  if(['school','kindergarten','university','college','library'].includes(a)) return 'school';
+  if(['park','garden','playground','sports_centre','fitness_centre'].includes(leisure)) return 'park';
+  if(['cinema','theatre','arts_centre','community_centre','events_venue'].includes(a)||['museum','gallery'].includes(tourism)) return 'culture';
+  if(shop || ['marketplace','restaurant','cafe','bank','post_office'].includes(a)) return 'shop';
+  if(office || ['industrial','commercial','retail'].includes(landuse) || ['coworking_space'].includes(a)) return 'work';
+  return null;
+}
+function poiName(tags,cat){ return tags.name || tags['name:ko'] || tags.brand || categoryLabel[cat]; }
+async function loadNearbyPois(){
+  clearPois();
+  const hint=document.getElementById('hint'); hint.textContent='주변 생활인프라 자동 검색 중...';
+  const r=1500;
+  const query=`[out:json][timeout:15];(
+node(around:${r},${MAIN.lat},${MAIN.lng})[amenity~"hospital|clinic|pharmacy|dentist|doctors|school|kindergarten|university|college|library|cinema|theatre|arts_centre|community_centre|marketplace|restaurant|cafe|bank|post_office"];
+node(around:${r},${MAIN.lat},${MAIN.lng})[shop];
+node(around:${r},${MAIN.lat},${MAIN.lng})[leisure~"park|garden|playground|sports_centre|fitness_centre"];
+node(around:${r},${MAIN.lat},${MAIN.lng})[office];
+way(around:${r},${MAIN.lat},${MAIN.lng})[amenity~"hospital|clinic|pharmacy|dentist|doctors|school|kindergarten|university|college|library|cinema|theatre|arts_centre|community_centre|marketplace|restaurant|cafe|bank|post_office"];
+way(around:${r},${MAIN.lat},${MAIN.lng})[shop];
+way(around:${r},${MAIN.lat},${MAIN.lng})[leisure~"park|garden|playground|sports_centre|fitness_centre"];
+way(around:${r},${MAIN.lat},${MAIN.lng})[office];
+);out center 80;`;
+  try{
+    const res=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:query,headers:{'Content-Type':'text/plain;charset=UTF-8'}});
+    const data=await res.json();
+    const seen=new Set(), byCat={work:0,shop:0,medical:0,school:0,park:0,culture:0};
+    (data.elements||[]).forEach(el=>{
+      const tags=el.tags||{}, cat=classify(tags); if(!cat || byCat[cat]>=8) return;
+      const lat=el.lat || (el.center&&el.center.lat), lng=el.lon || (el.center&&el.center.lon); if(!lat||!lng) return;
+      const name=poiName(tags,cat), key=cat+'|'+name+'|'+lat.toFixed(4)+'|'+lng.toFixed(4); if(seen.has(key)) return; seen.add(key); byCat[cat]++;
+      addPoi({cat,name,lat,lng,walk:distMin(MAIN.lat,MAIN.lng,lat,lng),desc:categoryDesc[cat]+' · OpenStreetMap 자동 검색'});
+    });
+    if(markers.length===0) fallbackPois(); updateCounts(); fitAll(); hint.textContent=`검색 완료 · 주변 인프라 ${markers.length}개 표시`;
+  }catch(e){ fallbackPois(); fitAll(); hint.textContent='주변 인프라 검색 실패 · 기본 마커로 표시'; }
+}
+function fitAll(){ const group=L.featureGroup([mainMarker,...markers.map(x=>x.marker)]); map.fitBounds(group.getBounds().pad(.18)); setTimeout(()=>map.invalidateSize(),250); }
+async function searchAddress(q){
+  q=(q||'').trim(); if(!q) return; const hint=document.getElementById('hint'); hint.textContent='주소 검색 중...';
+  try{ const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&q='+encodeURIComponent(q); const res=await fetch(url,{headers:{'Accept':'application/json'}}); const data=await res.json(); if(!data.length){hint.textContent='검색 결과가 없습니다. 동/번지까지 넣어보세요.'; return;} MAIN={lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon),name:q,addr:data[0].display_name}; drawMain(); const newUrl=location.pathname+'?q='+encodeURIComponent(q); history.replaceState(null,'',newUrl); await loadNearbyPois(); }
+  catch(e){ hint.textContent='검색 실패: 인터넷 연결 또는 브라우저 보안 설정을 확인하세요.'; }
+}
 document.querySelectorAll('.chip').forEach(chip=>chip.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); const cat=chip.dataset.cat; markers.forEach(({marker,cat:c})=>{if(cat==='all'||cat===c){if(!map.hasLayer(marker))map.addLayer(marker)}else{if(map.hasLayer(marker))map.removeLayer(marker)}})}));
 document.getElementById('searchBtn').addEventListener('click',()=>searchAddress(document.getElementById('addressInput').value));
 document.getElementById('addressInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchAddress(e.target.value)});
-drawMain(); drawPois(); fitAll(); const params=new URLSearchParams(location.search); if(params.get('q')){document.getElementById('addressInput').value=params.get('q'); searchAddress(params.get('q'));}
+drawMain(); loadNearbyPois(); const params=new URLSearchParams(location.search); if(params.get('q')){document.getElementById('addressInput').value=params.get('q'); searchAddress(params.get('q'));}
 </script>
 </body>
 </html>
