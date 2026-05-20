@@ -14,7 +14,7 @@
   <h1 id="title">생활권 인프라 지도</h1>
   <div class="sub" id="subtitle">주소를 입력하면 카카오 데이터로 주변 시설을 다시 검색합니다</div>
   <div class="searchbox"><input id="addressInput" type="search" placeholder="주소 또는 단지명 예: 울산 동구 전하동 280-3" value="울산 동구 전하동 280-3"><button id="searchBtn">검색</button></div>
-  <div class="hint" id="hint">공유링크: ?q=주소 · 카카오 JavaScript 키 필요</div>
+  <div class="hint" id="hint">공유링크: 주소 뒤에 ?q=주소 를 붙이면 해당 주소로 바로 열립니다</div>
 </div>
 <div id="map"></div>
 <div class="panel">
@@ -31,10 +31,10 @@
   <div class="footer-info">카카오 로컬 API 기반 · 도보시간은 직선거리 기준 추정</div>
 </div>
 
-<!-- TODO: 222563608848ddea15db9b5ddf83e859 를 본인 JavaScript 키로 교체 -->
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=222563608848ddea15db9b5ddf83e859&libraries=services"></script>
+<!-- Kakao JavaScript 키 적용 완료 -->
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=222563608848ddea15db9b5ddf83e859&autoload=false&libraries=services"></script>
 <script>
-if(!window.kakao){alert('카카오 JavaScript 키를 넣어야 지도가 실행됩니다. index.html에서 222563608848ddea15db9b5ddf83e859를 교체하세요.');}
+if(!window.kakao){alert('카카오맵 로딩 실패: JavaScript 키, Web 도메인 등록, 카카오맵 사용 설정 ON을 확인하세요.');}
 const qs=new URLSearchParams(location.search);const startQ=qs.get('q')||'울산 동구 전하동 280-3';document.getElementById('addressInput').value=startQ;
 const cats={work:{name:'직장',keywords:['관공서','산업단지','회사','오피스','공장'],code:null},shop:{name:'쇼핑',keywords:['마트','백화점','시장','편의점'],code:'MT1'},medical:{name:'의료',keywords:['병원','약국'],code:'HP8'},school:{name:'학교',keywords:['초등학교','중학교','고등학교','대학교','유치원'],code:'SC4'},park:{name:'공원',keywords:['공원'],code:'AT4'},subway:{name:'지하철',keywords:['역','지하철역'],code:'SW8'}};
 const colors={work:'#e0bd7e',shop:'#6ba3e0',medical:'#e06b7e',school:'#7ee0a3',park:'#a37ee0',subway:'#8bd3ff'};
