@@ -2507,47 +2507,80 @@ function savePDF(){
       logging: false,
       // ✅ 클론 단계에서 PDF 전용 처리 (live DOM은 건드리지 않음)
       onclone: (clonedDoc) => {
-        // body 폭 강제 고정 (가로 페이지 가득)
-        const cBody = clonedDoc.body;
-        cBody.style.maxWidth = captureWidth + 'px';
-        cBody.style.width = captureWidth + 'px';
-        cBody.style.margin = '0';
-        cBody.style.boxShadow = 'none';
-        cBody.style.padding = '0';
-        
-        // UI 컨트롤 숨김
-        const hideSelectors = [
-          '#reportNotice','.kakao-status','.kakao-chips',
-          '.topbar','.input-panel','.actions','.minimap'
-        ];
-        hideSelectors.forEach(sel => {
-          clonedDoc.querySelectorAll(sel).forEach(el => el.style.display = 'none');
-        });
+        // ★ 핵심: <style> 태그 직접 주입 — !important로 모든 미디어쿼리 무력화
+        const pdfStyle = clonedDoc.createElement('style');
+        pdfStyle.textContent = `
+          html, body {
+            max-width: ${captureWidth}px !important;
+            width: ${captureWidth}px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            background: #FBF7EC !important;
+          }
+          /* UI 컨트롤 숨김 */
+          #reportNotice, .kakao-status, .kakao-chips,
+          .topbar, .input-panel, .actions, .minimap {
+            display: none !important;
+          }
+          /* 가로 페이지 최적화 레이아웃 */
+          .kpis {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 12px !important;
+          }
+          .mats {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+          .mat.full {
+            grid-column: span 4 !important;
+          }
+          .swot {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          /* 표지·결론 와이드 패딩 */
+          .cover, .final {
+            padding: 60px 80px 70px !important;
+          }
+          .cover h1 {
+            font-size: 36pt !important;
+            line-height: 1.15 !important;
+          }
+          /* 본문 섹션 패딩 (가로 폭 활용) */
+          .sec {
+            padding: 32px 55px 38px !important;
+          }
+          .sec h3 {
+            font-size: 22pt !important;
+          }
+          /* 페이지 분할 제어 */
+          .cover {
+            page-break-after: always !important;
+            min-height: auto !important;
+          }
+          .final {
+            page-break-before: auto !important;
+          }
+          .sec {
+            page-break-inside: auto !important;
+          }
+          /* 큰 카드들은 잘리지 않게 */
+          .kpi, .persona, .pchart, .swot-cell, .tl-item, .mat,
+          .verdict, .sim, .tbl-wrap, .chmix {
+            page-break-inside: avoid !important;
+          }
+          /* 글자 크기 조정 (가로 페이지) */
+          body { font-size: 14px !important; }
+          .blist li { font-size: 13px !important; }
+          /* 표 가독성 */
+          table { font-size: 12px !important; }
+        `;
+        clonedDoc.head.appendChild(pdfStyle);
         
         // 카카오 지도는 iframe이라 PDF 캡처 안됨 → 텍스트 박스로 대체
         clonedDoc.querySelectorAll('.kakao-wrap').forEach(el => {
-          el.innerHTML = '<div style="padding:20px 16px;background:#F4ECD8;border-radius:6px;text-align:center;color:#5B5B5B;font-size:12px;border:1px solid #ddd;line-height:1.6"><b style="color:#0F2043;font-size:14px;display:block;margin-bottom:5px">📍 카카오 실측 인프라 지도</b>웹 버전에서 실시간 지도·시설 조회 가능</div>';
+          el.innerHTML = '<div style="padding:24px 18px;background:#F4ECD8;border-radius:6px;text-align:center;color:#5B5B5B;font-size:13px;border:1px solid #ddd;line-height:1.7"><b style="color:#0F2043;font-size:15px;display:block;margin-bottom:6px">📍 카카오 실측 인프라 지도</b>웹 버전에서 실시간 지도·시설 조회 가능 · QR/링크로 공유</div>';
           el.style.background = 'transparent';
           el.style.border = 'none';
-        });
-        
-        // 보고서 wrapper 정리
-        const cReport = clonedDoc.getElementById('report');
-        if(cReport){
-          cReport.style.width = captureWidth + 'px';
-          cReport.style.maxWidth = captureWidth + 'px';
-        }
-        
-        // 가로 페이지 최적화: 표지·결론 패딩 확장
-        clonedDoc.querySelectorAll('.cover, .final').forEach(el => {
-          el.style.padding = '60px 80px 70px';
-        });
-        clonedDoc.querySelectorAll('.cover h1').forEach(el => {
-          el.style.fontSize = '38pt';
-        });
-        // 섹션 패딩 조정 (가로 폭 활용)
-        clonedDoc.querySelectorAll('.sec').forEach(el => {
-          el.style.padding = '32px 50px 36px';
         });
       }
     },
@@ -2560,7 +2593,8 @@ function savePDF(){
     },
     pagebreak: {
       mode: ['css', 'legacy'],
-      avoid: ['.kpi','.persona','.pchart','.swot-cell','.tl-item','.mat','.verdict','.sim']
+      before: ['.final'],
+      avoid: ['.kpi','.persona','.pchart','.swot-cell','.tl-item','.mat','.verdict','.sim','.tbl-wrap','.chmix']
     }
   };
   
