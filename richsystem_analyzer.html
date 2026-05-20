@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0F2043">
 <title>(주)리치시스템 | 분양현장 시세조사·전략수립 자동화</title>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=222563608848ddea15db9b5ddf83e859&autoload=false&libraries=services"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root{
   --navy:#0F2043;
@@ -294,6 +295,98 @@ input[type=file]{display:none}
 .kk-info b{font-size:12px;display:block;margin-bottom:3px}
 .kk-info .dist{color:#7b5a16;font-weight:800;margin:3px 0;font-size:10px}
 .kk-info a{color:#1565c0;text-decoration:none;font-weight:800;font-size:10px}
+
+/* Price comparison chart */
+.pchart{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:14px 12px;
+  margin:8px 0 6px;
+}
+.pchart-title{
+  font-size:10px;letter-spacing:1px;
+  color:var(--ink-mute);
+  text-align:center;
+  margin-bottom:10px;
+  font-weight:700;
+}
+.prow{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 0;
+  font-size:11px;
+}
+.prow + .prow{border-top:1px dashed var(--line)}
+.prow.subject{
+  background:linear-gradient(90deg,rgba(255,215,0,0.08),transparent);
+  margin:4px -12px;padding:7px 12px;
+  border-radius:3px;
+  position:relative;
+}
+.prow.subject::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--gold);
+  border-radius:2px 0 0 2px;
+}
+.pname{
+  flex:0 0 100px;
+  font-size:10px;color:var(--ink-mute);
+  text-align:right;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.3;
+}
+.prow.subject .pname{
+  color:var(--navy);font-weight:800;font-size:11px;
+}
+.pbar{
+  flex:1;
+  height:16px;
+  background:var(--cream);
+  border-radius:2px;
+  overflow:hidden;
+  position:relative;
+  min-width:80px;
+}
+.pfill{
+  height:100%;
+  background:linear-gradient(90deg,#5A6B85 0%,var(--navy) 100%);
+  border-radius:2px;
+  transition:width 0.6s ease;
+}
+.prow.subject .pfill{
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-deep) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2);
+}
+.pval{
+  flex:0 0 56px;
+  text-align:right;
+  font-size:11px;
+  font-weight:700;
+  color:var(--navy);
+  font-variant-numeric:tabular-nums;
+}
+.pval small{font-size:9px;color:var(--ink-mute);font-weight:600;margin-left:1px}
+.prow.subject .pval{color:var(--navy);font-weight:800}
+.pchart-axis{
+  display:flex;justify-content:space-between;
+  margin-top:8px;padding-top:8px;
+  border-top:1px solid var(--line);
+  font-size:9px;color:var(--ink-mute);
+  letter-spacing:0.5px;
+}
+.pchart-axis b{color:var(--gold-deep);font-weight:800}
+@media (max-width:380px){
+  .pname{flex:0 0 80px;font-size:9px}
+  .pval{flex:0 0 48px;font-size:10px}
+}
+@media print{
+  .pchart{background:#fff !important;border:1px solid #ddd !important}
+  .prow.subject{background:#F4ECD8 !important}
+  .prow.subject::before{background:#FFD700 !important}
+  .pbar{background:#F4ECD8 !important}
+  .pfill{background:linear-gradient(90deg,#5A6B85 0%,#0F2043 100%) !important}
+  .prow.subject .pfill{background:linear-gradient(90deg,#FFD700 0%,#C9A961 100%) !important}
+}
 
 .btn-row{display:flex;gap:8px;margin-top:6px}
 .btn{
@@ -659,10 +752,155 @@ tbody td.name{text-align:left;font-weight:600;color:var(--navy)}
   body{max-width:900px;margin:0 auto;box-shadow:0 0 40px rgba(15,32,67,0.08)}
 }
 @media print{
-  .topbar,.input-panel,.actions,.minimap{display:none!important}
-  .sec{page-break-inside:avoid;padding:24px 32px}
-  body{background:#fff;font-size:11pt}
-  .cover{page-break-after:always}
+  /* 색상 강제 적용 (브라우저 기본 절약 동작 차단) */
+  *,*::before,*::after{
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+    color-adjust:exact !important;
+  }
+  /* UI 요소 숨김 */
+  .topbar,.input-panel,.actions,.minimap,
+  .kakao-status,.kakao-chips,
+  #reportNotice,
+  .opt-block{display:none !important}
+  
+  /* 페이지 설정 */
+  @page{
+    size:A4;
+    margin:0;
+  }
+  html,body{
+    background:#fff !important;
+    font-size:10pt;
+    margin:0;padding:0;
+  }
+  body{max-width:none !important;box-shadow:none !important}
+  
+  /* 표지: 다크 네이비 배경 유지 */
+  .cover{
+    background:linear-gradient(135deg,#06101F 0%,#0F2043 60%,#1A2F5A 100%) !important;
+    color:#fff !important;
+    padding:48px 44px 56px !important;
+    page-break-after:always;
+    min-height:100vh;
+    position:relative;
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
+  .cover *{color:inherit !important}
+  .cover h1{color:#fff !important;font-size:32pt !important}
+  .cover .loc,.cover .meta dt,.cover .footer{color:#E8D49A !important}
+  .cover .meta dd{color:#fff !important}
+  .cover .badge{
+    background:transparent !important;
+    color:#FFD700 !important;
+    border:1px solid #C9A961 !important;
+  }
+  .cover .gold-bar{background:#FFD700 !important}
+  
+  /* 본문 섹션 */
+  .sec{
+    page-break-inside:avoid;
+    padding:28px 36px !important;
+    background:#fff !important;
+    border-bottom:1px solid #ddd !important;
+  }
+  .sec h3{color:#0F2043 !important;font-size:18pt !important}
+  .sec h4{color:#0F2043 !important;font-size:11pt !important}
+  .sec-num{color:#C9A961 !important}
+  
+  /* KPI 카드 - 크림 배경 유지 */
+  .kpi{
+    background:#F4ECD8 !important;
+    border-left:3px solid #FFD700 !important;
+  }
+  .kpi .val{color:#0F2043 !important}
+  
+  /* 진단 박스 - 네이비 배경 유지 */
+  .verdict{
+    background:linear-gradient(135deg,#0F2043 0%,#06101F 100%) !important;
+    color:#fff !important;
+    border:1px solid #C9A961 !important;
+  }
+  .verdict::before{
+    background:#FFD700 !important;
+    color:#06101F !important;
+  }
+  .verdict .v-main{color:#E8D49A !important}
+  .verdict .v-sub{color:#fff !important}
+  
+  /* 테이블 헤더 - 네이비 유지 */
+  thead th{
+    background:#0F2043 !important;
+    color:#fff !important;
+  }
+  tbody tr.subject td{
+    background:#0F2043 !important;
+    color:#fff !important;
+  }
+  tbody tr.subject td:first-child{color:#FFD700 !important}
+  tbody tr:nth-child(odd) td{background:#FBF7EC !important}
+  
+  /* SWOT 컬러 셀 */
+  .swot-cell.s{background:#E8F2EC !important;color:#0F4A2C !important}
+  .swot-cell.w{background:#FBEFEC !important;color:#6A2A23 !important}
+  .swot-cell.o{background:#F4ECD8 !important;color:#5A4A1A !important}
+  .swot-cell.t{background:#EAEAF0 !important;color:#3B3B5A !important}
+  
+  /* 노트·태그 */
+  .note{
+    background:#F4ECD8 !important;
+    border-left:3px solid #C9A961 !important;
+  }
+  .blist li .tag{background:#0F2043 !important;color:#FFD700 !important}
+  .ptag{background:#E8D49A !important;color:#0F2043 !important}
+  
+  /* 무상품목 */
+  .mat{background:#fff !important;border:1px solid #ddd !important}
+  .mat.full{background:#0F2043 !important;color:#fff !important;border-color:#FFD700 !important}
+  .mat.full b{color:#FFD700 !important}
+  .mat b{color:#0F2043 !important}
+  
+  /* 채널 믹스 막대 */
+  .ch-bar{background:#F4ECD8 !important}
+  .ch-fill{background:linear-gradient(90deg,#FFD700 0%,#C9A961 100%) !important}
+  
+  /* 타임라인 */
+  .tl-item::before{background:#FFD700 !important;border:2px solid #0F2043 !important}
+  .tl-kpi{background:#F4ECD8 !important}
+  
+  /* 자금 시뮬레이션 */
+  .sim{background:#F4ECD8 !important}
+  
+  /* 결론 - 네이비 배경 */
+  .final{
+    background:linear-gradient(135deg,#0F2043 0%,#06101F 100%) !important;
+    color:#fff !important;
+    padding:48px 44px 56px !important;
+    page-break-before:auto;
+  }
+  .final *{color:inherit !important}
+  .final h3{color:#fff !important}
+  .final h3 em{color:#FFD700 !important}
+  .final .ft,.final .fmsg,.final .sign{color:#E8D49A !important}
+  .final .sign b{color:#FFD700 !important}
+  
+  /* 지도는 인쇄에서 큰 의미 없음 - 숨김 처리 */
+  .kakao-wrap{
+    border:1px solid #ddd !important;
+    background:#fff !important;
+  }
+  .kakaoMap{
+    background:#F4ECD8 !important;
+    height:200px !important;
+    position:relative;
+  }
+  .kakaoMap::after{
+    content:'📍 카카오 실측 인프라 (웹 버전에서만 표시)';
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    color:#5B5B5B;font-size:9pt;font-weight:600;
+  }
 }
 </style>
 </head>
@@ -760,7 +998,7 @@ tbody td.name{text-align:left;font-weight:600;color:var(--navy)}
 <!-- ============ BOTTOM ACTIONS ============ -->
 <div class="actions">
   <button class="act-btn" onclick="document.getElementById('input').scrollIntoView({behavior:'smooth'})">↑ 새 현장 입력</button>
-  <button class="act-btn gold" onclick="window.print()">📄 PDF로 저장</button>
+  <button class="act-btn gold" id="pdfBtn" onclick="savePDF()">📄 PDF 저장</button>
   <button class="act-btn" onclick="shareReport()">🔗 공유</button>
 </div>
 
@@ -1236,6 +1474,54 @@ const PROJECTS = {
 const h = (s) => s == null ? '' : s;
 const TODAY = new Date().toISOString().slice(0,10).replace(/-/g,' . ');
 
+// 시세 비교 그래프 빌더 (수평 막대)
+function buildPriceChart(subject, rows, pyungIdx, nameIdx){
+  pyungIdx = pyungIdx == null ? 4 : pyungIdx;
+  nameIdx = nameIdx == null ? 0 : nameIdx;
+  
+  const parseNum = (s) => parseInt(String(s).replace(/[^\d]/g,'')) || 0;
+  const all = [subject, ...rows];
+  const items = all.map((r,i) => ({
+    name: String(r[nameIdx]).replace(/^★\s*/,''),
+    val: parseNum(r[pyungIdx]),
+    raw: r[pyungIdx],
+    isSubject: i === 0
+  }));
+  
+  // 평당가 내림차순 정렬 (높은 순)
+  items.sort((a,b) => b.val - a.val);
+  
+  const max = Math.max(...items.map(i=>i.val));
+  const min = Math.min(...items.map(i=>i.val));
+  const avg = Math.round(items.reduce((s,i)=>s+i.val,0)/items.length);
+  
+  const subjectItem = items.find(i=>i.isSubject);
+  const diffPct = subjectItem ? ((subjectItem.val - avg) / avg * 100).toFixed(1) : 0;
+  const diffColor = diffPct > 0 ? 'color:#C9362C' : 'color:#1F7A4D';
+  
+  return `
+    <div class="pchart">
+      <div class="pchart-title">평당가 비교 차트 (만원/평)</div>
+      ${items.map(item => {
+        const width = max > 0 ? (item.val / max * 100).toFixed(1) : 0;
+        const nameShort = item.name.length > 14 ? item.name.substring(0,13)+'…' : item.name;
+        return `<div class="prow ${item.isSubject?'subject':''}">
+          <div class="pname">${item.isSubject?'★ ':''}${nameShort}</div>
+          <div class="pbar"><div class="pfill" style="width:${width}%"></div></div>
+          <div class="pval">${item.raw}</div>
+        </div>`;
+      }).join('')}
+      <div class="pchart-axis">
+        <span>최저 ${min.toLocaleString()}만</span>
+        <span>평균 <b>${avg.toLocaleString()}만</b></span>
+        <span>최고 ${max.toLocaleString()}만</span>
+      </div>
+      <div class="pchart-axis" style="border-top:0;padding-top:4px;justify-content:center">
+        <span>★ 본 현장 = <b style="${diffColor}">평균 대비 ${diffPct>0?'+':''}${diffPct}%</b></span>
+      </div>
+    </div>`;
+}
+
 // ===== 본문 렌더 =====
 function renderReport(p) {
   return `
@@ -1407,6 +1693,7 @@ function renderReport(p) {
       </tbody>
     </table>
   </div>
+  ${buildPriceChart(p.pricing.bSubject, p.pricing.bRows, 4, 0)}
   <div class="tbl-cap">${p.pricing.bCap}</div>
   <h4>${p.pricing.cTitle}</h4>
   <div class="tbl-wrap">
@@ -1418,6 +1705,7 @@ function renderReport(p) {
       </tbody>
     </table>
   </div>
+  ${buildPriceChart(p.pricing.cSubject, p.pricing.cRows, 3, 0)}
   <h4>적정 분양가 검증 (KEY FINDING)</h4>
   <ul class="blist">
     ${p.pricing.findings.map(f=>`<li>${f}</li>`).join('')}
@@ -2175,6 +2463,88 @@ function shareReport(){
   }
 }
 
+// ===== PDF 저장 (html2pdf.js - 화면 그대로) =====
+function savePDF(){
+  const btn = document.getElementById('pdfBtn');
+  const reportEl = document.getElementById('report');
+  const reportBody = document.getElementById('reportBody');
+  
+  if(!reportEl || !reportBody){
+    alert('보고서가 준비되지 않았습니다.');
+    return;
+  }
+  
+  if(typeof html2pdf === 'undefined'){
+    alert('PDF 라이브러리 로드 실패 — 새로고침 후 다시 시도하세요.');
+    return;
+  }
+  
+  // 현장명 추출 (파일명용)
+  const projName = (document.getElementById('proj').value || '시세조사').trim().replace(/[\\/:*?"<>|]/g,'');
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const filename = `${projName}_시세조사_${today}.pdf`;
+  
+  // 알림 배너 / 지도 인쇄 영역 / 칩 등 임시 숨김
+  const hideEls = document.querySelectorAll('#reportNotice, .kakao-status, .kakao-chips');
+  const prevDisplays = [];
+  hideEls.forEach((el,i) => {
+    prevDisplays[i] = el.style.display;
+    el.style.display = 'none';
+  });
+  
+  // 버튼 로딩 표시
+  const origBtnHTML = btn.innerHTML;
+  btn.innerHTML = '⏳ 생성중...';
+  btn.disabled = true;
+  
+  const opt = {
+    margin: [0, 0, 0, 0],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#FBF7EC',
+      windowWidth: 720,
+      scrollY: 0,
+      logging: false
+    },
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait',
+      compress: true
+    },
+    pagebreak: {
+      mode: ['css', 'legacy'],
+      avoid: ['.sec', '.kpi', '.persona', '.pchart', '.swot-cell', '.tl-item']
+    }
+  };
+  
+  // body의 max-width 일시 해제하여 캡처 안정화
+  const bodyOrigStyle = document.body.style.cssText;
+  document.body.style.maxWidth = '720px';
+  document.body.style.margin = '0 auto';
+  
+  setTimeout(() => {
+    html2pdf().set(opt).from(reportEl).save().then(() => {
+      // 복원
+      hideEls.forEach((el,i) => el.style.display = prevDisplays[i] || '');
+      document.body.style.cssText = bodyOrigStyle;
+      btn.innerHTML = origBtnHTML;
+      btn.disabled = false;
+    }).catch(err => {
+      console.error('PDF 저장 오류:', err);
+      alert('PDF 저장 중 오류가 발생했습니다: ' + err.message);
+      hideEls.forEach((el,i) => el.style.display = prevDisplays[i] || '');
+      document.body.style.cssText = bodyOrigStyle;
+      btn.innerHTML = origBtnHTML;
+      btn.disabled = false;
+    });
+  }, 200);
+}
+
 // ===== Kakao 지도 실연동 =====
 const KK_CATS = {
   work:    {name:'직장',   keywords:['관공서','산업단지','회사','오피스','공장'], code:null},
@@ -2424,22 +2794,68 @@ function kkSearchAddress(addr){
   }
   kkClear();
   kkSetStatus('주소 검색 중...', 'load');
-  kkGeocoder.addressSearch(addr, (res, status) => {
-    if(status === kakao.maps.services.Status.OK && res[0]){
-      kkDrawCenter(new kakao.maps.LatLng(res[0].y, res[0].x), addr);
-      kkSearchAll();
-    } else {
-      // 키워드 재시도
-      kkPlaces.keywordSearch(addr, (data, s) => {
-        if(s === kakao.maps.services.Status.OK && data[0]){
-          kkDrawCenter(new kakao.maps.LatLng(data[0].y, data[0].x), data[0].place_name);
-          kkSearchAll();
-        } else {
-          kkSetStatus('⚠️ 주소를 찾지 못했습니다', 'err');
-        }
-      });
+  
+  // 주소 형식 변형 (지오코더 호환성)
+  const variants = [];
+  variants.push(addr);
+  // 시·도 제거 (서울특별시, 울산광역시 등)
+  const noSido = addr.replace(/^[가-힣]+(특별시|광역시|특별자치시|특별자치도|도)\s*/, '');
+  if(noSido !== addr) variants.push(noSido);
+  // 번지 제거
+  const noBunji = addr.replace(/번지$/, '');
+  if(noBunji !== addr) variants.push(noBunji);
+  // 동·구만 (예: "여의도동 17-4")
+  const m = addr.match(/([가-힣]+동|[가-힣]+리)\s*[\d\-]+/);
+  if(m) variants.push(m[0]);
+  // 중복 제거
+  const uniq = [...new Set(variants)];
+  
+  // 변형들을 순차 시도
+  function tryVariant(idx){
+    if(idx >= uniq.length){
+      // 지오코더 전체 실패 → 키워드 검색
+      tryKeyword();
+      return;
     }
-  });
+    kkGeocoder.addressSearch(uniq[idx], (res, status) => {
+      if(status === kakao.maps.services.Status.OK && res[0]){
+        kkDrawCenter(new kakao.maps.LatLng(res[0].y, res[0].x), addr);
+        kkSearchAll();
+      } else {
+        tryVariant(idx + 1);
+      }
+    });
+  }
+  
+  function tryKeyword(){
+    // 키워드(장소명) 검색 (예: "파크라움 여의도")
+    const projName = (document.getElementById('proj').value || '').trim();
+    const keywordQ = projName || uniq[uniq.length-1] || addr;
+    kkPlaces.keywordSearch(keywordQ, (data, s) => {
+      if(s === kakao.maps.services.Status.OK && data[0]){
+        kkDrawCenter(new kakao.maps.LatLng(data[0].y, data[0].x), data[0].place_name);
+        kkSearchAll();
+      } else {
+        // 최종 fallback: 동 이름만 추출해서 검색
+        const dongMatch = addr.match(/([가-힣]+동)/);
+        if(dongMatch){
+          kkPlaces.keywordSearch(dongMatch[1], (data2, s2) => {
+            if(s2 === kakao.maps.services.Status.OK && data2[0]){
+              kkDrawCenter(new kakao.maps.LatLng(data2[0].y, data2[0].x), dongMatch[1] + ' (인근)');
+              kkSearchAll();
+              kkSetStatus('ⓘ 정확한 좌표 미확인 — '+dongMatch[1]+' 중심 인근 시설 표시', 'load');
+            } else {
+              kkSetStatus('⚠️ 주소를 찾지 못했습니다 — 더 간단한 주소로 시도하세요 (예: 여의도역)', 'err');
+            }
+          });
+        } else {
+          kkSetStatus('⚠️ 주소를 찾지 못했습니다 — 더 간단한 주소로 시도하세요', 'err');
+        }
+      }
+    });
+  }
+  
+  tryVariant(0);
 }
 
 // SDK 로드 핸들러
@@ -2465,14 +2881,28 @@ document.addEventListener('click', e => {
   }
 });
 
-// SDK 로드 대기
-if(window.kakao && window.kakao.maps){
-  kkOnSdkReady();
-} else {
-  window.addEventListener('load', () => {
-    setTimeout(kkOnSdkReady, 100);
-  });
+// SDK 로드 폴링 (최대 10초)
+let kkLoadAttempts = 0;
+function kkWaitForSdk(){
+  kkLoadAttempts++;
+  if(window.kakao && window.kakao.maps){
+    kkOnSdkReady();
+    return;
+  }
+  if(kkLoadAttempts > 100){
+    kkSetStatus('⚠️ Kakao SDK 로드 시간 초과 (10초) — 네트워크/도메인 등록 확인', 'err');
+    return;
+  }
+  // 로드 중 상태 표시
+  if(kkLoadAttempts === 5){
+    kkSetStatus('Kakao SDK 로드 중...', 'load');
+  }
+  if(kkLoadAttempts === 30){
+    kkSetStatus('Kakao SDK 로드 중... (네트워크 느릴 수 있음)', 'load');
+  }
+  setTimeout(kkWaitForSdk, 100);
 }
+kkWaitForSdk();
 
 // 보고서 갱신시 지도도 함께 갱신
 const _origApplyProject = applyProject;
