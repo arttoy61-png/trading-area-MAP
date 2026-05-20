@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
 <title>Trading Area MAP · Kakao</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"맑은 고딕","Malgun Gothic",sans-serif;background:#07111f;color:#fff;overflow:hidden}.header{position:fixed;top:0;left:0;right:0;z-index:20;padding:calc(9px + env(safe-area-inset-top)) 10px 9px;background:linear-gradient(180deg,rgba(7,17,31,.98),rgba(7,17,31,.9));border-bottom:1px solid rgba(201,169,97,.28);backdrop-filter:blur(8px)}.tag{font-size:9px;letter-spacing:2px;color:#c9a961;font-weight:900}h1{margin:3px 0 5px;font-size:16px;line-height:1.2}.sub{font-size:10px;color:#9da8c0;margin-bottom:7px}.searchbox{display:flex;gap:5px}.searchbox input{flex:1;min-width:0;height:35px;border-radius:10px;border:1px solid rgba(201,169,97,.38);background:rgba(255,255,255,.08);color:#fff;padding:0 10px;font-size:13px;outline:none}.searchbox button{height:35px;border:0;border-radius:10px;padding:0 12px;background:#c9a961;color:#07111f;font-weight:900;font-size:12px;white-space:nowrap}.hint{margin-top:5px;font-size:9.5px;color:#8e99ae;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#map{position:absolute;top:135px;bottom:165px;left:0;right:0}.panel{position:fixed;bottom:0;left:0;right:0;z-index:20;padding:8px 10px calc(10px + env(safe-area-inset-bottom));max-height:165px;background:linear-gradient(0deg,#07111f 94%,rgba(7,17,31,.94));border-top:1px solid rgba(201,169,97,.28)}.filters{display:flex;gap:5px;overflow-x:auto;padding-bottom:7px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.chip{flex-shrink:0;padding:7px 10px;border-radius:16px;font-size:11px;font-weight:900;background:rgba(255,255,255,.06);color:#c9d2e5;border:1px solid rgba(255,255,255,.12);cursor:pointer;white-space:nowrap}.chip.active{background:#c9a961;color:#07111f;border-color:#c9a961}.cnt{opacity:.75;margin-left:2px}.legend{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:9.5px;color:#9da8c0}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.footer-info{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08);font-size:8.8px;color:#6e7a93;text-align:center}.label{position:relative;transform:translate(-50%,-100%);white-space:nowrap;padding:5px 8px;border-radius:14px;background:#07111f;color:#fff;font-size:10px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.45);border:1.5px solid}.mainLabel{background:#c9a961;color:#07111f;border:2px solid #fff;box-shadow:0 3px 12px rgba(201,169,97,.55);font-size:11px}.work{border-color:#e0bd7e}.shop{border-color:#6ba3e0}.medical{border-color:#e06b7e}.school{border-color:#7ee0a3}.park{border-color:#a37ee0}.subway{border-color:#8bd3ff}.info{padding:10px 12px;min-width:190px;color:#111;font-size:12px;line-height:1.45}.info b{font-size:13px}.info .dist{color:#7b5a16;font-weight:800;margin:4px 0}.info a{color:#1565c0;text-decoration:none;font-weight:800}@media(max-height:700px){#map{top:127px;bottom:143px}.panel{max-height:143px}.legend{display:none}}@media(min-width:768px){.header{padding-left:18px;padding-right:18px}h1{font-size:20px}.sub{font-size:12px}.searchbox{max-width:650px}.panel{max-height:178px}.legend{grid-template-columns:repeat(4,1fr)}#map{top:145px;bottom:178px}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"맑은 고딕","Malgun Gothic",sans-serif;background:#07111f;color:#fff;overflow:hidden}.header{position:fixed;top:0;left:0;right:0;z-index:20;padding:calc(9px + env(safe-area-inset-top)) 10px 9px;background:linear-gradient(180deg,rgba(7,17,31,.98),rgba(7,17,31,.9));border-bottom:1px solid rgba(201,169,97,.28);backdrop-filter:blur(8px)}.tag{font-size:9px;letter-spacing:2px;color:#c9a961;font-weight:900}h1{margin:3px 0 5px;font-size:16px;line-height:1.2}.sub{font-size:10px;color:#9da8c0;margin-bottom:7px}.searchbox{display:flex;gap:5px}.searchbox input{flex:1;min-width:0;height:35px;border-radius:10px;border:1px solid rgba(201,169,97,.38);background:rgba(255,255,255,.08);color:#fff;padding:0 10px;font-size:13px;outline:none}.searchbox button{height:35px;border:0;border-radius:10px;padding:0 12px;background:#c9a961;color:#07111f;font-weight:900;font-size:12px;white-space:nowrap}.hint{margin-top:5px;font-size:9.5px;color:#8e99ae;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#map{position:absolute;top:135px;bottom:165px;left:0;right:0}.panel{position:fixed;bottom:0;left:0;right:0;z-index:20;padding:8px 10px calc(10px + env(safe-area-inset-bottom));max-height:165px;background:linear-gradient(0deg,#07111f 94%,rgba(7,17,31,.94));border-top:1px solid rgba(201,169,97,.28)}.filters{display:flex;gap:5px;overflow-x:auto;padding-bottom:7px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.chip{flex-shrink:0;padding:7px 10px;border-radius:16px;font-size:11px;font-weight:900;background:rgba(255,255,255,.06);color:#c9d2e5;border:1px solid rgba(255,255,255,.12);cursor:pointer;white-space:nowrap}.chip.active{background:#c9a961;color:#07111f;border-color:#c9a961}.cnt{opacity:.75;margin-left:2px}.legend{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:9.5px;color:#9da8c0}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.footer-info{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08);font-size:8.8px;color:#6e7a93;text-align:center}.label{position:relative;transform:translate(-50%,-100%);white-space:nowrap;padding:5px 8px;border-radius:14px;background:#07111f;color:#fff;font-size:10px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.45);border:1.5px solid;cursor:pointer}.mainLabel{background:#c9a961;color:#07111f;border:2px solid #fff;box-shadow:0 3px 12px rgba(201,169,97,.55);font-size:11px;cursor:default}.work{border-color:#e0bd7e}.shop{border-color:#6ba3e0}.medical{border-color:#e06b7e}.school{border-color:#7ee0a3}.park{border-color:#a37ee0}.subway{border-color:#8bd3ff}.info{padding:10px 12px;min-width:190px;color:#111;font-size:12px;line-height:1.45}.info b{font-size:13px}.info .dist{color:#7b5a16;font-weight:800;margin:4px 0}.info a{color:#1565c0;text-decoration:none;font-weight:800}@media(max-height:700px){#map{top:127px;bottom:143px}.panel{max-height:143px}.legend{display:none}}@media(min-width:768px){.header{padding-left:18px;padding-right:18px}h1{font-size:20px}.sub{font-size:12px}.searchbox{max-width:650px}.panel{max-height:178px}.legend{grid-template-columns:repeat(4,1fr)}#map{top:145px;bottom:178px}}
 </style>
 </head>
 <body>
@@ -31,30 +31,253 @@
   <div class="footer-info">카카오 로컬 API 기반 · 도보시간은 직선거리 기준 추정</div>
 </div>
 
-<!-- Kakao JavaScript 키 적용 완료 -->
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=222563608848ddea15db9b5ddf83e859&autoload=false&libraries=services"></script>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=222563608848ddea15db9b5ddf83e859&autoload=false&libraries=services" onerror="onSdkScriptError()"></script>
 <script>
-if(!window.kakao){alert('카카오맵 로딩 실패: JavaScript 키, Web 도메인 등록, 카카오맵 사용 설정 ON을 확인하세요.');}
-const qs=new URLSearchParams(location.search);const startQ=qs.get('q')||'울산 동구 전하동 280-3';document.getElementById('addressInput').value=startQ;
-const cats={work:{name:'직장',keywords:['관공서','산업단지','회사','오피스','공장'],code:null},shop:{name:'쇼핑',keywords:['마트','백화점','시장','편의점'],code:'MT1'},medical:{name:'의료',keywords:['병원','약국'],code:'HP8'},school:{name:'학교',keywords:['초등학교','중학교','고등학교','대학교','유치원'],code:'SC4'},park:{name:'공원',keywords:['공원'],code:'AT4'},subway:{name:'지하철',keywords:['역','지하철역'],code:'SW8'}};
-const colors={work:'#e0bd7e',shop:'#6ba3e0',medical:'#e06b7e',school:'#7ee0a3',park:'#a37ee0',subway:'#8bd3ff'};
-let map, geocoder, places, mainOverlay, radiusCircles=[], overlays=[], infowindow, currentCat='all', centerLatLng;
-function init(){map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(35.4955,129.4135),level:4});geocoder=new kakao.maps.services.Geocoder();places=new kakao.maps.services.Places();infowindow=new kakao.maps.InfoWindow({zIndex:5});searchAddress(startQ);}
-function setMsg(t){document.getElementById('hint').textContent=t}
-function clearMap(){if(mainOverlay)mainOverlay.setMap(null);radiusCircles.forEach(c=>c.setMap(null));radiusCircles=[];overlays.forEach(o=>o.overlay.setMap(null));overlays=[];infowindow.close();}
-function drawMain(latlng,label){centerLatLng=latlng;map.setCenter(latlng);map.setLevel(4);mainOverlay=new kakao.maps.CustomOverlay({position:latlng,content:'<div class="label mainLabel">★ 기준 위치</div>',yAnchor:1.1});mainOverlay.setMap(map);[335,670,1005].forEach(r=>{const c=new kakao.maps.Circle({center:latlng,radius:r,strokeWeight:1,strokeColor:'#c9a961',strokeOpacity:.45,strokeStyle:'dash',fillColor:'#c9a961',fillOpacity:.04});c.setMap(map);radiusCircles.push(c);});document.getElementById('title').textContent=label;document.getElementById('subtitle').textContent='카카오 기준 주변 인프라 자동 검색';}
-function distMin(lat,lng){const p=new kakao.maps.LatLng(lat,lng);const poly=new kakao.maps.Polyline({path:[centerLatLng,p]});const m=poly.getLength();return Math.max(1,Math.round(m/67));}
-function addPlace(cat,p){const lat=Number(p.y),lng=Number(p.x),min=distMin(lat,lng);const pos=new kakao.maps.LatLng(lat,lng);const content='<div class="label '+cat+'">'+escapeHtml(p.place_name)+'</div>';const overlay=new kakao.maps.CustomOverlay({position:pos,content:content,yAnchor:1.1});overlay.cat=cat;overlay.setMap(currentCat==='all'||currentCat===cat?map:null);kakao.maps.event.addListener(overlay,'click',()=>{});const marker=new kakao.maps.Marker({position:pos,clickable:true});kakao.maps.event.addListener(marker,'click',()=>{});overlay.getContent && null;overlays.push({cat,overlay,place:p,min});}
-function bindClicks(){setTimeout(()=>{document.querySelectorAll('.label:not(.mainLabel)').forEach(el=>{el.onclick=()=>{const name=el.textContent;const item=overlays.find(o=>o.place.place_name===name);if(!item)return;const p=item.place;const pos=new kakao.maps.LatLng(p.y,p.x);infowindow.setContent('<div class="info"><b>'+escapeHtml(p.place_name)+'</b><div class="dist">도보 약 '+item.min+'분 · '+cats[item.cat].name+'</div><div>'+escapeHtml(p.road_address_name||p.address_name||'')+'</div><a target="_blank" href="'+p.place_url+'">카카오맵에서 보기</a></div>');infowindow.open(map,new kakao.maps.Marker({position:pos}));};});},300)}
-function searchAddress(q){clearMap();setMsg('주소 검색 중...');geocoder.addressSearch(q,(res,status)=>{if(status===kakao.maps.services.Status.OK&&res[0]){const latlng=new kakao.maps.LatLng(res[0].y,res[0].x);drawMain(latlng,q);searchAll();}else{places.keywordSearch(q,(data,s)=>{if(s===kakao.maps.services.Status.OK&&data[0]){const latlng=new kakao.maps.LatLng(data[0].y,data[0].x);drawMain(latlng,data[0].place_name);searchAll();}else setMsg('주소/장소를 찾지 못했습니다. 더 정확히 입력하세요.');});}})}
-function searchAll(){const jobs=[];Object.keys(cats).forEach(cat=>{const c=cats[cat];if(c.code) jobs.push(new Promise(resolve=>places.categorySearch(c.code,(data,status)=>{if(status===kakao.maps.services.Status.OK)data.slice(0,8).forEach(p=>addPlace(cat,p));resolve();},{location:centerLatLng,radius:1500,sort:kakao.maps.services.SortBy.DISTANCE,size:10})));c.keywords.forEach(k=>jobs.push(new Promise(resolve=>places.keywordSearch(k,(data,status)=>{if(status===kakao.maps.services.Status.OK)data.slice(0,5).forEach(p=>addPlace(cat,p));resolve();},{location:centerLatLng,radius:1500,sort:kakao.maps.services.SortBy.DISTANCE,size:5}))));});Promise.all(jobs).then(()=>{dedupe();updateCounts();fitBounds();bindClicks();setMsg('카카오 데이터 검색 완료 · 결과는 현장 검증 권장');});}
-function dedupe(){const seen=new Set();overlays=overlays.filter(o=>{const key=o.place.id||o.place.place_name+'|'+o.place.x+'|'+o.place.y;if(seen.has(key)){o.overlay.setMap(null);return false}seen.add(key);return true});}
-function updateCounts(){const counts={all:overlays.length,work:0,shop:0,medical:0,school:0,park:0,subway:0};overlays.forEach(o=>counts[o.cat]++);Object.keys(counts).forEach(k=>{const el=document.getElementById('cnt-'+k);if(el)el.textContent=counts[k];});}
-function fitBounds(){const b=new kakao.maps.LatLngBounds();b.extend(centerLatLng);overlays.slice(0,40).forEach(o=>b.extend(new kakao.maps.LatLng(o.place.y,o.place.x)));if(!b.isEmpty())map.setBounds(b);}
-function filter(cat){currentCat=cat;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.cat===cat));overlays.forEach(o=>o.overlay.setMap(cat==='all'||o.cat===cat?map:null));}
-function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
-document.getElementById('searchBtn').onclick=()=>searchAddress(document.getElementById('addressInput').value.trim());document.getElementById('addressInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchAddress(e.target.value.trim())});document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>filter(c.dataset.cat));
-if(window.kakao) kakao.maps.load(init);
+function onSdkScriptError(){
+  setMsg('⚠️ 카카오맵 SDK 스크립트 로드 실패 — 네트워크/방화벽 확인');
+  console.error('Kakao Maps SDK script failed to load');
+}
+
+function setMsg(t){var el=document.getElementById('hint');if(el)el.textContent=t;}
+
+// SDK 로드 여부 확인
+if(typeof window.kakao === 'undefined' || !window.kakao.maps){
+  setMsg('⚠️ 카카오맵 SDK 미로드 — JS키/도메인 등록/사용 설정 확인하세요');
+  console.error('window.kakao or kakao.maps is undefined. Check: (1) JavaScript Key (2) Web platform domain registration on developers.kakao.com (3) Kakao Map service ON');
+}
+
+const qs = new URLSearchParams(location.search);
+const startQ = qs.get('q') || '울산 동구 전하동 280-3';
+document.getElementById('addressInput').value = startQ;
+
+const cats = {
+  work:    {name:'직장',   keywords:['관공서','산업단지','회사','오피스','공장'], code:null},
+  shop:    {name:'쇼핑',   keywords:['마트','백화점','시장','편의점'],            code:'MT1'},
+  medical: {name:'의료',   keywords:['병원','약국'],                              code:'HP8'},
+  school:  {name:'학교',   keywords:['초등학교','중학교','고등학교','대학교','유치원'], code:'SC4'},
+  park:    {name:'공원',   keywords:['공원'],                                     code:'AT4'},
+  subway:  {name:'지하철', keywords:['역','지하철역'],                            code:'SW8'}
+};
+
+let map, geocoder, places, mainOverlay;
+let radiusCircles = [], overlays = [];
+let infowindow, currentCat = 'all', centerLatLng;
+// infowindow를 매번 새 Marker로 여는 대신, 위치 참조용 단일 Marker 재사용
+let anchorMarker;
+
+function init(){
+  try{
+    map = new kakao.maps.Map(document.getElementById('map'),{
+      center: new kakao.maps.LatLng(35.4955, 129.4135),
+      level: 4
+    });
+    geocoder = new kakao.maps.services.Geocoder();
+    places   = new kakao.maps.services.Places();
+    infowindow = new kakao.maps.InfoWindow({zIndex:5});
+    anchorMarker = new kakao.maps.Marker({position: new kakao.maps.LatLng(0,0)}); // 지도에 setMap 안 함 → 표시 X
+    searchAddress(startQ);
+  }catch(e){
+    console.error('init error:', e);
+    setMsg('⚠️ 지도 초기화 실패: ' + e.message);
+  }
+}
+
+function clearMap(){
+  if(mainOverlay) mainOverlay.setMap(null);
+  radiusCircles.forEach(c => c.setMap(null));
+  radiusCircles = [];
+  overlays.forEach(o => o.overlay.setMap(null));
+  overlays = [];
+  if(infowindow) infowindow.close();
+}
+
+function drawMain(latlng, label){
+  centerLatLng = latlng;
+  map.setCenter(latlng);
+  map.setLevel(4);
+  mainOverlay = new kakao.maps.CustomOverlay({
+    position: latlng,
+    content: '<div class="label mainLabel">★ 기준 위치</div>',
+    yAnchor: 1.1
+  });
+  mainOverlay.setMap(map);
+  [335, 670, 1005].forEach(r => {
+    const c = new kakao.maps.Circle({
+      center: latlng, radius: r,
+      strokeWeight: 1, strokeColor: '#c9a961', strokeOpacity: .45, strokeStyle: 'dash',
+      fillColor: '#c9a961', fillOpacity: .04
+    });
+    c.setMap(map);
+    radiusCircles.push(c);
+  });
+  document.getElementById('title').textContent = label;
+  document.getElementById('subtitle').textContent = '카카오 기준 주변 인프라 자동 검색';
+}
+
+// ✅ Haversine 공식으로 거리 계산 (Polyline.getLength 사용 X — 더 안정적)
+function distMin(lat, lng){
+  if(!centerLatLng) return 1;
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const lat1 = centerLatLng.getLat();
+  const lng1 = centerLatLng.getLng();
+  const dLat = toRad(lat - lat1);
+  const dLng = toRad(lng - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat))*Math.sin(dLng/2)**2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const m = R * c;
+  return Math.max(1, Math.round(m / 67)); // 약 4km/h = 67m/min
+}
+
+function addPlace(cat, p){
+  const lat = Number(p.y), lng = Number(p.x);
+  if(!isFinite(lat) || !isFinite(lng)) return;
+  const min = distMin(lat, lng);
+  const pos = new kakao.maps.LatLng(lat, lng);
+  const content = '<div class="label ' + cat + '" data-name="' + escapeAttr(p.place_name) + '">' + escapeHtml(p.place_name) + '</div>';
+  const overlay = new kakao.maps.CustomOverlay({position: pos, content: content, yAnchor: 1.1});
+  overlay.cat = cat;
+  overlay.setMap((currentCat === 'all' || currentCat === cat) ? map : null);
+  // ❌ 제거: kakao.maps.event.addListener(overlay,'click',...) — CustomOverlay는 미지원
+  // ❌ 제거: 안 쓰는 Marker 생성 + addListener
+  // ❌ 제거: overlay.getContent && null;
+  overlays.push({cat, overlay, place: p, min, pos});
+}
+
+function bindClicks(){
+  // CustomOverlay의 클릭은 DOM 이벤트로 처리 (Kakao API 권장 방식)
+  setTimeout(() => {
+    document.querySelectorAll('.label:not(.mainLabel)').forEach(el => {
+      if(el.dataset.bound === '1') return; // 중복 바인딩 방지
+      el.dataset.bound = '1';
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        const name = el.getAttribute('data-name') || el.textContent;
+        const item = overlays.find(o => o.place.place_name === name);
+        if(!item) return;
+        const p = item.place;
+        infowindow.setContent(
+          '<div class="info"><b>' + escapeHtml(p.place_name) + '</b>' +
+          '<div class="dist">도보 약 ' + item.min + '분 · ' + cats[item.cat].name + '</div>' +
+          '<div>' + escapeHtml(p.road_address_name || p.address_name || '') + '</div>' +
+          '<a target="_blank" rel="noopener" href="' + escapeAttr(p.place_url || '') + '">카카오맵에서 보기</a></div>'
+        );
+        // ✅ 매번 새 Marker를 만들지 않고 재사용 Marker의 position만 변경
+        anchorMarker.setPosition(item.pos);
+        infowindow.open(map, anchorMarker);
+      });
+    });
+  }, 300);
+}
+
+function searchAddress(q){
+  if(!q){setMsg('주소를 입력하세요');return;}
+  clearMap();
+  setMsg('주소 검색 중...');
+  geocoder.addressSearch(q, (res, status) => {
+    if(status === kakao.maps.services.Status.OK && res[0]){
+      drawMain(new kakao.maps.LatLng(res[0].y, res[0].x), q);
+      searchAll();
+    } else {
+      // 주소가 아니면 키워드(장소명)로 재시도
+      places.keywordSearch(q, (data, s) => {
+        if(s === kakao.maps.services.Status.OK && data[0]){
+          drawMain(new kakao.maps.LatLng(data[0].y, data[0].x), data[0].place_name);
+          searchAll();
+        } else {
+          setMsg('주소/장소를 찾지 못했습니다. 더 정확히 입력하세요.');
+        }
+      });
+    }
+  });
+}
+
+function searchAll(){
+  const jobs = [];
+  Object.keys(cats).forEach(cat => {
+    const c = cats[cat];
+    if(c.code){
+      jobs.push(new Promise(resolve => {
+        places.categorySearch(c.code, (data, status) => {
+          if(status === kakao.maps.services.Status.OK) data.slice(0, 8).forEach(p => addPlace(cat, p));
+          resolve();
+        }, {location: centerLatLng, radius: 1500, sort: kakao.maps.services.SortBy.DISTANCE, size: 10});
+      }));
+    }
+    c.keywords.forEach(k => {
+      jobs.push(new Promise(resolve => {
+        places.keywordSearch(k, (data, status) => {
+          if(status === kakao.maps.services.Status.OK) data.slice(0, 5).forEach(p => addPlace(cat, p));
+          resolve();
+        }, {location: centerLatLng, radius: 1500, sort: kakao.maps.services.SortBy.DISTANCE, size: 5});
+      }));
+    });
+  });
+  Promise.all(jobs).then(() => {
+    dedupe();
+    updateCounts();
+    fitBounds();
+    bindClicks();
+    setMsg('카카오 데이터 검색 완료 · 결과는 현장 검증 권장');
+  }).catch(err => {
+    console.error('searchAll error:', err);
+    setMsg('⚠️ 검색 중 오류: ' + err.message);
+  });
+}
+
+function dedupe(){
+  const seen = new Set();
+  overlays = overlays.filter(o => {
+    const key = o.place.id || (o.place.place_name + '|' + o.place.x + '|' + o.place.y);
+    if(seen.has(key)){
+      o.overlay.setMap(null);
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
+function updateCounts(){
+  const counts = {all: overlays.length, work:0, shop:0, medical:0, school:0, park:0, subway:0};
+  overlays.forEach(o => counts[o.cat]++);
+  Object.keys(counts).forEach(k => {
+    const el = document.getElementById('cnt-' + k);
+    if(el) el.textContent = counts[k];
+  });
+}
+
+function fitBounds(){
+  if(!centerLatLng) return;
+  const b = new kakao.maps.LatLngBounds();
+  b.extend(centerLatLng);
+  overlays.slice(0, 40).forEach(o => b.extend(o.pos));
+  if(!b.isEmpty()) map.setBounds(b);
+}
+
+function filter(cat){
+  currentCat = cat;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+  overlays.forEach(o => o.overlay.setMap((cat === 'all' || o.cat === cat) ? map : null));
+  bindClicks(); // ✅ 필터 후 새로 보이는 라벨에도 클릭 이벤트 바인딩
+}
+
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+}
+function escapeAttr(s){
+  return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+document.getElementById('searchBtn').onclick = () => searchAddress(document.getElementById('addressInput').value.trim());
+document.getElementById('addressInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') searchAddress(e.target.value.trim());
+});
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => filter(c.dataset.cat));
+
+if(window.kakao && window.kakao.maps){
+  kakao.maps.load(init);
+}
 </script>
 </body>
 </html>
