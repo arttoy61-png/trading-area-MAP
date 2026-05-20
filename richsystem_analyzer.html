@@ -2487,9 +2487,9 @@ function savePDF(){
   btn.innerHTML = '⏳ 생성중... (10~20초)';
   btn.disabled = true;
   
-  // A4 세로 내부 폭 계산 (210mm - 좌우 10mm margin = 190mm)
-  // 96 DPI 기준: 190 / 25.4 * 96 ≈ 718px → 720으로 반올림
-  const captureWidth = 720;
+  // A4 가로(landscape) 내부 폭 계산 (297mm - 좌우 10mm margin = 277mm)
+  // 96 DPI 기준: 277 / 25.4 * 96 ≈ 1047px → 1040으로 정렬
+  const captureWidth = 1040;
   
   const opt = {
     margin: [10, 10, 10, 10],
@@ -2507,7 +2507,7 @@ function savePDF(){
       logging: false,
       // ✅ 클론 단계에서 PDF 전용 처리 (live DOM은 건드리지 않음)
       onclone: (clonedDoc) => {
-        // body 폭 강제 고정
+        // body 폭 강제 고정 (가로 페이지 가득)
         const cBody = clonedDoc.body;
         cBody.style.maxWidth = captureWidth + 'px';
         cBody.style.width = captureWidth + 'px';
@@ -2526,7 +2526,7 @@ function savePDF(){
         
         // 카카오 지도는 iframe이라 PDF 캡처 안됨 → 텍스트 박스로 대체
         clonedDoc.querySelectorAll('.kakao-wrap').forEach(el => {
-          el.innerHTML = '<div style="padding:18px 14px;background:#F4ECD8;border-radius:6px;text-align:center;color:#5B5B5B;font-size:11px;border:1px solid #ddd;line-height:1.6"><b style="color:#0F2043;font-size:13px;display:block;margin-bottom:4px">📍 카카오 실측 인프라 지도</b>웹 버전에서 실시간 지도·시설 조회 가능</div>';
+          el.innerHTML = '<div style="padding:20px 16px;background:#F4ECD8;border-radius:6px;text-align:center;color:#5B5B5B;font-size:12px;border:1px solid #ddd;line-height:1.6"><b style="color:#0F2043;font-size:14px;display:block;margin-bottom:5px">📍 카카오 실측 인프라 지도</b>웹 버전에서 실시간 지도·시설 조회 가능</div>';
           el.style.background = 'transparent';
           el.style.border = 'none';
         });
@@ -2537,12 +2537,24 @@ function savePDF(){
           cReport.style.width = captureWidth + 'px';
           cReport.style.maxWidth = captureWidth + 'px';
         }
+        
+        // 가로 페이지 최적화: 표지·결론 패딩 확장
+        clonedDoc.querySelectorAll('.cover, .final').forEach(el => {
+          el.style.padding = '60px 80px 70px';
+        });
+        clonedDoc.querySelectorAll('.cover h1').forEach(el => {
+          el.style.fontSize = '38pt';
+        });
+        // 섹션 패딩 조정 (가로 폭 활용)
+        clonedDoc.querySelectorAll('.sec').forEach(el => {
+          el.style.padding = '32px 50px 36px';
+        });
       }
     },
     jsPDF: {
       unit: 'mm',
       format: 'a4',
-      orientation: 'portrait',
+      orientation: 'landscape',
       compress: true,
       putOnlyUsedFonts: true
     },
