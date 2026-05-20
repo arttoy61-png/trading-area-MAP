@@ -1018,6 +1018,7 @@ const PROJECTS = {
   parkraum_yeoeuido: {
     keys: ['여의도','17-4','파크라움'],
     region: '서울 영등포',
+    coords: { lat: 37.5219, lng: 126.9245 },
     cover: {
       title: '파크라움 여의도<br>오피스텔',
       address: '서울특별시 영등포구 여의도동 17-4',
@@ -1243,6 +1244,7 @@ const PROJECTS = {
   kcc_jeonha: {
     keys: ['전하동','전하','280-3','스위첸','웰츠','웰츠타워','KCC','울산'],
     region: '울산 동구',
+    coords: { lat: 35.5042, lng: 129.4197 },
     cover: {
       title: 'KCC 스위첸<br>웰츠타워 2단지',
       address: '울산광역시 동구 전하동 280-3',
@@ -2853,14 +2855,21 @@ function kkEscAttr(s){
   return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-function kkSearchAddress(addr){
+function kkSearchAddress(addr, coords){
   if(!kkReady || !kkGeocoder){
     kkSetStatus('지도 대기중... 잠시 후 자동 재시도', 'load');
-    setTimeout(() => kkSearchAddress(addr), 500);
+    setTimeout(() => kkSearchAddress(addr, coords), 500);
     return;
   }
   kkClear();
   kkSetStatus('주소 검색 중...', 'load');
+  
+  // ★ 좌표 직접 지정된 경우 (사전입력 현장) — 지오코더 우회
+  if(coords && coords.lat && coords.lng){
+    kkDrawCenter(new kakao.maps.LatLng(coords.lat, coords.lng), addr);
+    kkSearchAll();
+    return;
+  }
   
   // 주소 형식 변형 (지오코더 호환성)
   const variants = [];
@@ -2903,7 +2912,7 @@ function kkSearchAddress(addr){
         kkDrawCenter(new kakao.maps.LatLng(data[0].y, data[0].x), data[0].place_name);
         kkSearchAll();
       } else {
-        // 최종 fallback: 동 이름만 추출해서 검색
+        // 동 이름만 추출해서 검색
         const dongMatch = addr.match(/([가-힣]+동)/);
         if(dongMatch){
           kkPlaces.keywordSearch(dongMatch[1], (data2, s2) => {
@@ -2912,14 +2921,27 @@ function kkSearchAddress(addr){
               kkSearchAll();
               kkSetStatus('ⓘ 정확한 좌표 미확인 — '+dongMatch[1]+' 중심 인근 시설 표시', 'load');
             } else {
-              kkSetStatus('⚠️ 주소를 찾지 못했습니다 — 더 간단한 주소로 시도하세요 (예: 여의도역)', 'err');
+              fallbackToCurrentCenter(addr);
             }
           });
         } else {
-          kkSetStatus('⚠️ 주소를 찾지 못했습니다 — 더 간단한 주소로 시도하세요', 'err');
+          fallbackToCurrentCenter(addr);
         }
       }
     });
+  }
+  
+  // ★ 최종 fallback: 지도 중심에서 그냥 카테고리 검색 진행
+  function fallbackToCurrentCenter(addr){
+    if(kkMap){
+      const center = kkMap.getCenter();
+      kkCenter = center;
+      kkDrawCenter(center, addr + ' (추정 위치)');
+      kkSearchAll();
+      kkSetStatus('ⓘ 좌표 미확인 — 지도 중심 기준 인근 시설 자동 표시', 'load');
+    } else {
+      kkSetStatus('⚠️ 지도 미준비 상태', 'err');
+    }
   }
   
   tryVariant(0);
@@ -2934,8 +2956,14 @@ function kkOnSdkReady(){
   kkSdkLoaded = true;
   kakao.maps.load(() => {
     if(kkInit()){
+      // 페이지 로드시 대기 중이던 프로젝트가 있으면 그 좌표 사용
+      const pending = window.__pendingProject;
       const currentAddr = document.getElementById('addr').value.trim();
-      if(currentAddr) kkSearchAddress(currentAddr);
+      if(pending && pending.coords){
+        kkSearchAddress(pending.cover.address, pending.coords);
+      } else if(currentAddr){
+        kkSearchAddress(currentAddr);
+      }
     }
   });
 }
@@ -2978,10 +3006,12 @@ applyProject = function(project, isMatched, regionLabel){
   // 지도 재초기화 + 검색
   setTimeout(() => {
     if(kkReady){
-      kkSearchAddress(project.cover.address);
+      kkSearchAddress(project.cover.address, project.coords);
     } else if(kkSdkLoaded){
       kkOnSdkReady();
     }
+    // 페이지 로드시 SDK가 아직 안 됐으면 SDK 준비 후 자동 검색되도록 저장
+    window.__pendingProject = project;
   }, 100);
 };
 </script>
