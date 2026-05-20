@@ -2467,82 +2467,103 @@ function shareReport(){
 function savePDF(){
   const btn = document.getElementById('pdfBtn');
   const reportEl = document.getElementById('report');
-  const reportBody = document.getElementById('reportBody');
   
-  if(!reportEl || !reportBody){
+  if(!reportEl){
     alert('보고서가 준비되지 않았습니다.');
     return;
   }
-  
   if(typeof html2pdf === 'undefined'){
     alert('PDF 라이브러리 로드 실패 — 새로고침 후 다시 시도하세요.');
     return;
   }
   
-  // 현장명 추출 (파일명용)
+  // 파일명
   const projName = (document.getElementById('proj').value || '시세조사').trim().replace(/[\\/:*?"<>|]/g,'');
   const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
-  const filename = `${projName}_시세조사_${today}.pdf`;
+  const filename = projName + '_시세조사_' + today + '.pdf';
   
-  // 알림 배너 / 지도 인쇄 영역 / 칩 등 임시 숨김
-  const hideEls = document.querySelectorAll('#reportNotice, .kakao-status, .kakao-chips');
-  const prevDisplays = [];
-  hideEls.forEach((el,i) => {
-    prevDisplays[i] = el.style.display;
-    el.style.display = 'none';
-  });
-  
-  // 버튼 로딩 표시
+  // 버튼 로딩
   const origBtnHTML = btn.innerHTML;
-  btn.innerHTML = '⏳ 생성중...';
+  btn.innerHTML = '⏳ 생성중... (10~20초)';
   btn.disabled = true;
   
+  // A4 세로 내부 폭 계산 (210mm - 좌우 10mm margin = 190mm)
+  // 96 DPI 기준: 190 / 25.4 * 96 ≈ 718px → 720으로 반올림
+  const captureWidth = 720;
+  
   const opt = {
-    margin: [0, 0, 0, 0],
+    margin: [10, 10, 10, 10],
     filename: filename,
-    image: { type: 'jpeg', quality: 0.95 },
+    image: { type: 'jpeg', quality: 0.92 },
     html2canvas: {
       scale: 2,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#FBF7EC',
-      windowWidth: 720,
+      windowWidth: captureWidth,
+      width: captureWidth,
+      scrollX: 0,
       scrollY: 0,
-      logging: false
+      logging: false,
+      // ✅ 클론 단계에서 PDF 전용 처리 (live DOM은 건드리지 않음)
+      onclone: (clonedDoc) => {
+        // body 폭 강제 고정
+        const cBody = clonedDoc.body;
+        cBody.style.maxWidth = captureWidth + 'px';
+        cBody.style.width = captureWidth + 'px';
+        cBody.style.margin = '0';
+        cBody.style.boxShadow = 'none';
+        cBody.style.padding = '0';
+        
+        // UI 컨트롤 숨김
+        const hideSelectors = [
+          '#reportNotice','.kakao-status','.kakao-chips',
+          '.topbar','.input-panel','.actions','.minimap'
+        ];
+        hideSelectors.forEach(sel => {
+          clonedDoc.querySelectorAll(sel).forEach(el => el.style.display = 'none');
+        });
+        
+        // 카카오 지도는 iframe이라 PDF 캡처 안됨 → 텍스트 박스로 대체
+        clonedDoc.querySelectorAll('.kakao-wrap').forEach(el => {
+          el.innerHTML = '<div style="padding:18px 14px;background:#F4ECD8;border-radius:6px;text-align:center;color:#5B5B5B;font-size:11px;border:1px solid #ddd;line-height:1.6"><b style="color:#0F2043;font-size:13px;display:block;margin-bottom:4px">📍 카카오 실측 인프라 지도</b>웹 버전에서 실시간 지도·시설 조회 가능</div>';
+          el.style.background = 'transparent';
+          el.style.border = 'none';
+        });
+        
+        // 보고서 wrapper 정리
+        const cReport = clonedDoc.getElementById('report');
+        if(cReport){
+          cReport.style.width = captureWidth + 'px';
+          cReport.style.maxWidth = captureWidth + 'px';
+        }
+      }
     },
     jsPDF: {
       unit: 'mm',
       format: 'a4',
       orientation: 'portrait',
-      compress: true
+      compress: true,
+      putOnlyUsedFonts: true
     },
     pagebreak: {
       mode: ['css', 'legacy'],
-      avoid: ['.sec', '.kpi', '.persona', '.pchart', '.swot-cell', '.tl-item']
+      avoid: ['.kpi','.persona','.pchart','.swot-cell','.tl-item','.mat','.verdict','.sim']
     }
   };
   
-  // body의 max-width 일시 해제하여 캡처 안정화
-  const bodyOrigStyle = document.body.style.cssText;
-  document.body.style.maxWidth = '720px';
-  document.body.style.margin = '0 auto';
-  
+  // 캡처 실행
   setTimeout(() => {
     html2pdf().set(opt).from(reportEl).save().then(() => {
-      // 복원
-      hideEls.forEach((el,i) => el.style.display = prevDisplays[i] || '');
-      document.body.style.cssText = bodyOrigStyle;
       btn.innerHTML = origBtnHTML;
       btn.disabled = false;
     }).catch(err => {
       console.error('PDF 저장 오류:', err);
-      alert('PDF 저장 중 오류가 발생했습니다: ' + err.message);
-      hideEls.forEach((el,i) => el.style.display = prevDisplays[i] || '');
-      document.body.style.cssText = bodyOrigStyle;
+      alert('PDF 저장 중 오류: ' + err.message + '\n\n새로고침 후 다시 시도해주세요.');
       btn.innerHTML = origBtnHTML;
       btn.disabled = false;
     });
-  }, 200);
+  }, 100);
 }
 
 // ===== Kakao 지도 실연동 =====
